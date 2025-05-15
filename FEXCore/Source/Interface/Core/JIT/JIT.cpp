@@ -1083,12 +1083,11 @@ CPUBackend::CompiledCode Arm64JITCore::CompileCode(uint64_t Entry, uint64_t Size
 
       // NOTE: 16-byte alignment of the new cursor offset must be preserved for block linking records
       SetBuffer(CurrentCodeBuffer->Ptr, CurrentCodeBuffer->AllocatedSize);
-      SetCursorOffset(AlignUp(CodeBuffers.LatestOffset, 16));
+      SetCursorOffset(CodeBuffers.LatestOffset);
+      Align16B();
       if ((GetCursorOffset() + TempSize) > CurrentCodeBuffer->UsableSize()) {
         CTX->ClearCodeCache(ThreadState);
       }
-
-      Align16B();
 
       CodeBuffers.LatestOffset = GetCursorOffset();
     }
