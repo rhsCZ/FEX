@@ -488,7 +488,7 @@
         "HasSideEffects": true,
         "Desc": ["Spills an SSA value to memory",
                  "Spill slots are register allocated and has live ranges calculated to handle slot calculation",
-                 "```diff\n- !Don't use this op. It is for RA to handle spilling and filling!\n```"
+                 "!Don't use this op. It is for RA to handle spilling and filling!"
                 ],
         "EmitValidation": [
           "WalkFindRegClass($Value) == $Class"
@@ -498,7 +498,7 @@
       "SSA = FillRegister OpSize:#Size, OpSize:#ElementSize, u32:$Slot, RegisterClass:$Class": {
         "Desc": ["Fills a register from a spill slot",
                  "Spill slots are register allocated and has live ranges calculated to handle slot calculation",
-                 "```diff\n- !Don't use this op. It is for RA to handle spilling and filling!\n```"
+                 "!Don't use this op. It is for RA to handle spilling and filling!"
                 ],
         "DestSize": "Size",
         "ElementSize": "ElementSize"
