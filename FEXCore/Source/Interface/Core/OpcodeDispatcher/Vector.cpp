@@ -620,7 +620,7 @@ Ref OpDispatchBuilder::InsertScalarFCMPOpImpl(OpSize Size, IR::OpSize OpDstSize,
     // If either of the sources are unordered, then returns true.
     Ref Src1_U = _VFCMPEQ(Size, ElementSize, Src1, Src1);
     Ref Src2_U = _VFCMPEQ(Size, ElementSize, Src2, Src2);
-    auto Ordered = _VAnd(ElementSize, ElementSize, Src1_U, Src2_U);
+    auto Ordered = _VAnd(Size, ElementSize, Src1_U, Src2_U);
 
     Ref Compare_Ordered = _VFCMPEQ(Size, ElementSize, Src1, Src2);
     Ref Result = _VOrn(Size, ElementSize, Compare_Ordered, Ordered);
@@ -2525,7 +2525,7 @@ Ref OpDispatchBuilder::VFCMPOpImpl(OpSize Size, IR::OpSize ElementSize, Ref Src1
     // If either of the sources are unordered, then returns true.
     Ref Src1_U = _VFCMPEQ(Size, ElementSize, Src1, Src1);
     Ref Src2_U = _VFCMPEQ(Size, ElementSize, Src2, Src2);
-    auto Ordered = _VAnd(ElementSize, ElementSize, Src1_U, Src2_U);
+    auto Ordered = _VAnd(Size, ElementSize, Src1_U, Src2_U);
 
     Ref Compare_Ordered = _VFCMPEQ(Size, ElementSize, Src1, Src2);
     return _VOrn(Size, ElementSize, Compare_Ordered, Ordered);
