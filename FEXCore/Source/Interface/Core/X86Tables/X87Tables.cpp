@@ -17,7 +17,7 @@ using namespace IR;
 // All OPDReg versions need it
 #define OPDReg(op, reg) ((1 << 15) | ((op - 0xD8) << 8) | (reg << 3))
 #define OPD(op, modrmop) (((op - 0xD8) << 8) | modrmop)
-constexpr std::array<DispatchTableEntry, 138> X87F64OpTable = {{
+constexpr std::array<DispatchTableEntry, 140> X87F64OpTable = {{
   {OPDReg(0xD8, 0) | 0x00, 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FADDF64, OpSize::i32Bit, false, OpDispatchBuilder::OpResult::RES_ST0>},
 
   {OPDReg(0xD8, 1) | 0x00, 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FMULF64, OpSize::i32Bit, false, OpDispatchBuilder::OpResult::RES_ST0>},
@@ -281,6 +281,8 @@ constexpr std::array<DispatchTableEntry, 138> X87F64OpTable = {{
   // We don't support this currently, so just pop the stack
   {OPD(0xDF, 0xC0), 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::X87ModifySTP, true>},
   {OPD(0xDF, 0xC8), 8, &OpDispatchBuilder::FXCH},
+  {OPD(0xDF, 0xD0), 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FSTToStack>},
+  {OPD(0xDF, 0xD8), 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FSTToStack>},
 
   {OPD(0xDF, 0xE0), 8, &OpDispatchBuilder::X87FNSTSW},
   {OPD(0xDF, 0xE8), 8,
@@ -289,7 +291,7 @@ constexpr std::array<DispatchTableEntry, 138> X87F64OpTable = {{
    &OpDispatchBuilder::Bind<&OpDispatchBuilder::FCOMIF64, OpSize::f80Bit, false, OpDispatchBuilder::FCOMIFlags::FLAGS_RFLAGS, false>},
 }};
 
-constexpr std::array<DispatchTableEntry, 138> X87F80OpTable = {{
+constexpr std::array<DispatchTableEntry, 140> X87F80OpTable = {{
   {OPDReg(0xD8, 0) | 0x00, 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FADD, OpSize::i32Bit, false, OpDispatchBuilder::OpResult::RES_ST0>},
 
   {OPDReg(0xD8, 1) | 0x00, 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FMUL, OpSize::i32Bit, false, OpDispatchBuilder::OpResult::RES_ST0>},
@@ -540,6 +542,8 @@ constexpr std::array<DispatchTableEntry, 138> X87F80OpTable = {{
   // We don't support this currently, so just pop the stack
   {OPD(0xDF, 0xC0), 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::X87ModifySTP, true>},
   {OPD(0xDF, 0xC8), 8, &OpDispatchBuilder::FXCH},
+  {OPD(0xDF, 0xD0), 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FSTToStack>},
+  {OPD(0xDF, 0xD8), 8, &OpDispatchBuilder::Bind<&OpDispatchBuilder::FSTToStack>},
 
   {OPD(0xDF, 0xE0), 8, &OpDispatchBuilder::X87FNSTSW},
   {OPD(0xDF, 0xE8), 8,
@@ -786,9 +790,9 @@ auto GenerateX87TableLambda = [](const auto DispatchTable) consteval {
       //  / 1
       {OPD(0xDF, 0xC8), 8, X86InstInfo{"FXCH",    TYPE_X87, FLAGS_NONE, 0}},
       //  / 2
-      {OPD(0xDF, 0xD0), 8, X86InstInfo{"",        TYPE_INVALID, FLAGS_NONE, 0}},
+      {OPD(0xDF, 0xD0), 8, X86InstInfo{"FSTP",    TYPE_X87, FLAGS_SF_MOD_DST | FLAGS_POP, 0}},
       //  / 3
-      {OPD(0xDF, 0xD8), 8, X86InstInfo{"",        TYPE_INVALID, FLAGS_NONE, 0}},
+      {OPD(0xDF, 0xD8), 8, X86InstInfo{"FSTP",    TYPE_X87, FLAGS_SF_MOD_DST | FLAGS_POP, 0}},
       //  / 4
       {OPD(0xDF, 0xE0), 1, X86InstInfo{"FNSTSW",  TYPE_INST, GenFlagsSameSize(SIZE_16BIT) | FLAGS_SF_DST_RAX, 0}},
       {OPD(0xDF, 0xE1), 7, X86InstInfo{"",        TYPE_INVALID, FLAGS_NONE, 0}},
